@@ -1,0 +1,26 @@
+﻿@model IEnumerable<Texture>
+<div class="container">
+    <div class="row">
+        <div class="col d-flex align-items-center">
+            <h3 class="mr-2">Textures</h3>
+            <a class="h3 ms-lg-1" asp-area="" asp-controller="Texture" asp-action="Create"><i class="bi bi-plus-square"></i></a>
+        </div>
+    </div>
+    <div class="row">
+        @foreach (var texture in Model)
+        {
+            <div class="col-md-4 mb-3">
+                <div class="card">
+                    <h4 class="card-Header">@texture.Name</h4>
+                    <img src="" class="card-img-top" alt="Item Image">
+                    <div class="card-body">
+                        @*<div class="card-text">@bobaflavor.Description</div>*@
+                        <button class="btn btn-primary"><i class="bi bi-pencil-square"></i></button>
+                        <button class="btn btn-danger"><i class="bi bi-trash3-fill"></i></button>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
