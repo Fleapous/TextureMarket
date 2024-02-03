@@ -43,12 +43,10 @@ namespace TextureMarket.Controllers
             Console.WriteLine($"Received Width: {texture.Width}, Height: {texture.Height}, NoiseType: {texture.NoiseType}");
             byte[] textureData = GenerateTextureData(texture);
 
-            // Save the texture file
             string wwwrootPath = hostingEnvironment.WebRootPath;
             string filePath = Path.Combine(wwwrootPath, "images", "generatedTexture.png");
             System.IO.File.WriteAllBytes(filePath, textureData);
 
-            // Return the file path or content
             return Json(new { filePath = "/images/generatedTexture.png" });
         }
 
