@@ -1,1 +1,126 @@
-﻿
+﻿@model Texture
+
+<div class="container mt-5">
+    <h1>Texture Form</h1>
+
+    <div class="row">
+        <div class="col-md-6">
+            <form method="post">
+                <div class="mb-3 row">
+                    <div class="col-md-4">
+                        <label asp-for="Width" class="form-label">Width:</label>
+                        <input asp-for="Width" class="form-control" />
+                        <span asp-validation-for="Width" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label asp-for="Height" class="form-label">Height:</label>
+                        <input asp-for="Height" class="form-control" />
+                        <span asp-validation-for="Height" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label asp-for="Scale" class="form-label">Scale:</label>
+                        <input asp-for="Scale" class="form-control" />
+                        <span asp-validation-for="Scale" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="mb-3 row">
+                    <div class="col-md-4">
+                        <label asp-for="Octaves" class="form-label">Octaves:</label>
+                        <input asp-for="Octaves" class="form-control" />
+                        <span asp-validation-for="Octaves" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label asp-for="Persistence" class="form-label">Persistence:</label>
+                        <input asp-for="Persistence" class="form-control" />
+                        <span asp-validation-for="Persistence" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label asp-for="Lacunarity" class="form-label">Lacunarity:</label>
+                        <input asp-for="Lacunarity" class="form-control" />
+                        <span asp-validation-for="Lacunarity" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="mb-3 row">
+                    <div class="col-md-6">
+                        <label asp-for="Seed" class="form-label">Seed:</label>
+                        <input asp-for="Seed" class="form-control" />
+                        <span asp-validation-for="Seed" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="NoiseType" class="form-label">Noise Type:</label>
+                        <select asp-for="NoiseType" class="form-select" asp-items="Html.GetEnumSelectList<NoiseType>()">
+                            <option value="">Select Noise Type</option>
+                        </select>
+                        <span asp-validation-for="NoiseType" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Submit</button>
+                <button type="button" class="btn btn-success" onclick="generateTexture()">Generate</button>
+            </form>
+
+        </div>
+        <div class="col-md-6">
+            <div id="generatedResult" class="text-center mt-3"></div>
+        </div>
+    </div>
+</div>
+<script>
+    function generateTexture() {
+        var formData = {
+            Width: parseInt(document.getElementById('Width').value),
+            Height: parseInt(document.getElementById('Height').value),
+            NoiseType: parseInt(document.getElementById('NoiseType').value),
+            Seed: parseInt(document.getElementById('Seed').value),
+            Scale: parseFloat(document.getElementById('Scale').value),
+            Octaves: parseInt(document.getElementById('Octaves').value),
+            Persistence: parseFloat(document.getElementById('Persistence').value),
+            Lacunarity: parseFloat(document.getElementById('Lacunarity').value),
+            Name: "DummyTexture"
+        };
+
+        //for debug
+        //var formData = {
+        //    Width: 100,
+        //    Height: 100,
+        //    NoiseType: 0,
+        //    Seed: 42,
+        //    Scale: 1.0,
+        //    Octaves: 4,
+        //    Persistence: 0.5,
+        //    Lacunarity: 2.0,
+        //    // Id is omitted
+        //    Name: "DummyTexture" // Assuming Name is part of your model, set it to a default value
+        //};
+
+        //AJAX request to the server for generation
+        fetch('/Texture/Generate', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'RequestVerificationToken': '@Html.AntiForgeryToken()'
+            },
+            body: JSON.stringify(formData)
+        })
+            .then(response => response.json())
+            .then(data => {
+                var generatedResult = document.getElementById('generatedResult');
+                generatedResult.innerHTML = '<p>Generated Texture:</p>';
+
+                var imgElement = document.createElement('img');
+                imgElement.src = data.filePath;
+                generatedResult.appendChild(imgElement);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    }
+
+</script>
