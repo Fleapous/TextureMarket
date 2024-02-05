@@ -6,6 +6,7 @@ using TextureMarket.Repository;
 using TextureMarket.Repository.IRepository;
 using Microsoft.Extensions.Hosting.Internal;
 using SkiaSharp;
+using SimplexNoise;
 
 namespace TextureMarket.Controllers
 {
@@ -34,8 +35,14 @@ namespace TextureMarket.Controllers
         [HttpPost]
         public IActionResult Create(Texture model)
         {
-            
-            return RedirectToAction("Index");
+            if (ModelState.IsValid)
+            {
+                _unitOfWork.Texture.update(model);
+                _unitOfWork.Save();
+                return RedirectToAction("Index");    
+            }
+
+            return View(model);
         }
 
         [HttpPost]
@@ -53,15 +60,24 @@ namespace TextureMarket.Controllers
 
         private byte[] GenerateTextureData(Texture texture)
         {
-
-
             using (var skBitmap = new SKBitmap(texture.Width, texture.Height))
             {
                 // Use SkiaSharp to draw on the SKBitmap
                 using (var canvas = new SKCanvas(skBitmap))
                 {
-                    canvas.Clear(SKColors.Red);
+                    // canvas.Clear(SKColors.Red);
                     // You can do more drawing operations here if needed
+
+                    var noiseMap = GenerateNoiseMap(texture);
+                    for (int x = 0; x < texture.Width; x++)
+                    {
+                        for (int y = 0; y < texture.Height; y++)
+                        {
+                            var noiseVal = (byte)noiseMap[x, y];
+                            canvas.DrawPoint(x, y, new SKColor(noiseVal, noiseVal, noiseVal));        
+                        }
+                    }
+                    
                 }
 
                 // Convert SKBitmap to byte array
@@ -72,6 +88,12 @@ namespace TextureMarket.Controllers
                     return stream.ToArray();
                 }
             }
+        }
+
+        private float[,] GenerateNoiseMap(Texture textureData)
+        {
+            SimplexNoise.Noise.Seed = textureData.Seed;
+            return SimplexNoise.Noise.Calc2D(textureData.Width, textureData.Height, textureData.Scale);
         }
     }
 }
