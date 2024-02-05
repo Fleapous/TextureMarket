@@ -5,6 +5,7 @@ using TextureMarket.Models;
 using TextureMarket.Repository;
 using TextureMarket.Repository.IRepository;
 using Microsoft.Extensions.Hosting.Internal;
+using SkiaSharp;
 
 namespace TextureMarket.Controllers
 {
@@ -54,16 +55,20 @@ namespace TextureMarket.Controllers
         {
 
 
-            using (var bitmap = new Bitmap(texture.Width, texture.Height))
+            using (var skBitmap = new SKBitmap(texture.Width, texture.Height))
             {
-                using (var graphics = Graphics.FromImage(bitmap))
+                // Use SkiaSharp to draw on the SKBitmap
+                using (var canvas = new SKCanvas(skBitmap))
                 {
-                    graphics.Clear(Color.Red);
+                    canvas.Clear(SKColors.Red);
+                    // You can do more drawing operations here if needed
                 }
 
-                using (MemoryStream stream = new MemoryStream())
+                // Convert SKBitmap to byte array
+                using (var image = SKImage.FromBitmap(skBitmap))
+                using (var stream = new MemoryStream())
                 {
-                    bitmap.Save(stream, ImageFormat.Png);
+                    image.Encode(SKEncodedImageFormat.Png, 100).SaveTo(stream);
                     return stream.ToArray();
                 }
             }

@@ -3,13 +3,16 @@ using Microsoft.EntityFrameworkCore;
 using TextureMarket.Data;
 using TextureMarket.Repository;
 using TextureMarket.Repository.IRepository;
+using Azure.Identity;
+using Azure.Security.KeyVault.Secrets;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
 builder.Services.AddDbContext<ApplicationDbContext>(o =>
-    o.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    o.UseSqlServer(builder.Configuration.GetConnectionString("AzureConnection")));
 
 builder.Services.AddRazorPages();
 
